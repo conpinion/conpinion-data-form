@@ -1,0 +1,20 @@
+#buttonBar {
+@apply(--layout-horizontal);
+  padding: 3em 0 2em 0;
+}
+
+#buttonBar paper-button {
+  background-color: #E8E8E8;
+}
+
+#buttonBar paper-button:hover {
+  background: #bfbfbf;
+}
+
+#buttonBar paper-button:focus {
+  background: #bfbfbf;
+}
+
+[form] {
+@apply(--layout-vertical);
+}

@@ -1,0 +1,232 @@
+
+<!--
+Copyright (c) 2015 TELCAT MULTICOM GmbH. All rights reserved.
+Copyright (c) 2016 conpinion GbR. All rights reserved.
+
+Element: conpinion-data-form
+Version: 0.1.29
+Description: A data form component
+-->
+
+
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../grapp-i18n-js/grapp-i18n-js.html">
+<link rel="import" href="conpinion-data-fieldset.html">
+<link rel="import" href="conpinion-data-boolean-field.html">
+<link rel="import" href="conpinion-data-select-field.html">
+<link rel="import" href="conpinion-data-multiline-string-field.html">
+<link rel="import" href="conpinion-data-string-field.html">
+
+<dom-module id="conpinion-data-form">
+
+  <link rel="stylesheet" href="../semantic-ui/dist/components/reset.css">
+  <link rel="stylesheet" href="../semantic-ui/dist/components/label.css">
+
+  <template>
+
+<style >#buttonBar {
+@apply(--layout-horizontal);
+  padding: 3em 0 2em 0;
+}
+
+#buttonBar paper-button {
+  background-color: #E8E8E8;
+}
+
+#buttonBar paper-button:hover {
+  background: #bfbfbf;
+}
+
+#buttonBar paper-button:focus {
+  background: #bfbfbf;
+}
+
+[form] {
+@apply(--layout-vertical);
+}
+</style>
+
+    <div form>
+
+      <template is="dom-if" if="[[item]]">
+        <content></content>
+      </template>
+
+      <div id="buttonBar">
+        <paper-button class="flex" raised on-tap="save">Speichern</paper-button>
+        <paper-button class="flex" raised on-tap="cancel">Abbrechen</paper-button>
+      </div>
+
+    </div>
+
+  </template>
+
+<script type="text/javascript">(function() {
+  Polymer({
+    is: 'conpinion-data-form',
+    behaviors: [Grapp.I18NJsBehavior],
+    properties: {
+      resource: {
+        type: Object
+      },
+      model: {
+        type: String,
+        value: 'model'
+      },
+      router: {
+        type: Object
+      },
+      closeRoute: {
+        type: String
+      }
+    },
+    ready: function() {
+      var field, fieldsetField, i, len, ref, results;
+      this.fields = [];
+      ref = Polymer.dom(this).children;
+      results = [];
+      for (i = 0, len = ref.length; i < len; i++) {
+        field = ref[i];
+        if (field.nodeName === 'conpinion-DATA-FIELDSET') {
+          results.push((function() {
+            var j, len1, ref1, results1;
+            ref1 = Polymer.dom(field).children;
+            results1 = [];
+            for (j = 0, len1 = ref1.length; j < len1; j++) {
+              fieldsetField = ref1[j];
+              if (this._isDataField(fieldsetField)) {
+                results1.push(this.fields.push(this._initField(fieldsetField)));
+              } else {
+                results1.push(void 0);
+              }
+            }
+            return results1;
+          }).call(this));
+        } else if (this._isDataField(field)) {
+          results.push(this.fields.push(this._initField(field)));
+        } else {
+          results.push(void 0);
+        }
+      }
+      return results;
+    },
+    attached: function() {
+      return this.fieldsByName = this.fields.reduce((function(acc, field) {
+        acc[field.name] = field;
+        return acc;
+      }), {});
+    },
+    load: function(href) {
+      var field, i, len, ref;
+      if (!this.resource || !href || href === '') {
+        this.item = {};
+        if (this.fields) {
+          ref = this.fields;
+          for (i = 0, len = ref.length; i < len; i++) {
+            field = ref[i];
+            this._loadField(field);
+          }
+          return this._clearFieldErrors;
+        }
+      } else {
+        return this.resource.show(href).then((function(_this) {
+          return function(success) {
+            var j, len1, ref1;
+            _this.item = success.data;
+            ref1 = _this.fields;
+            for (j = 0, len1 = ref1.length; j < len1; j++) {
+              field = ref1[j];
+              _this._loadField(field);
+            }
+            return _this._clearFieldErrors;
+          };
+        })(this), (function(_this) {
+          return function(error) {
+            return _this.fire('conpinion-data-form-error', error.data);
+          };
+        })(this));
+      }
+    },
+    save: function() {
+      if (this.item.href) {
+        return this.resource.update(this.item.href, this.item).then((function(_this) {
+          return function(success) {
+            return _this.closeForm();
+          };
+        })(this), (function(_this) {
+          return function(error) {
+            _this._setFieldErrors(error.data.error.errors);
+            return _this.fire('conpinion-data-form-error', error.data);
+          };
+        })(this));
+      } else {
+        return this.resource.create(this.item).then((function(_this) {
+          return function(success) {
+            return _this.closeForm();
+          };
+        })(this), (function(_this) {
+          return function(error) {
+            _this._setFieldErrors(error.data.error.errors);
+            return _this.fire('conpinion-data-form-error', error.data);
+          };
+        })(this));
+      }
+    },
+    cancel: function() {
+      return this.closeForm();
+    },
+    closeForm: function() {
+      if (this.closeRoute) {
+        return this.router.go(this.closeRoute);
+      } else {
+        return this.fire('conpinion-data-form-close');
+      }
+    },
+    _isDataField: function(elem) {
+      return elem.nodeName.startsWith('conpinion-') && elem.nodeName.endsWith('-FIELD');
+    },
+    _initField: function(field) {
+      field.model = this.model;
+      return field;
+    },
+    _loadField: function(field) {
+      var i, len, path_segment, resource_path;
+      resource_path = field.name.split('.');
+      if (resource_path.length > 1) {
+        resource_path.splice(-1, 1);
+        for (i = 0, len = resource_path.length; i < len; i++) {
+          path_segment = resource_path[i];
+          if (!this.item[path_segment]) {
+            this.item[path_segment] = {};
+          }
+        }
+      }
+      return field.item = this.item;
+    },
+    _setFieldErrors: function(errors) {
+      var error, i, len, ref, results;
+      this._clearFieldErrors;
+      results = [];
+      for (i = 0, len = errors.length; i < len; i++) {
+        error = errors[i];
+        results.push((ref = this.fieldsByName[error.attribute]) != null ? ref.error = error.message : void 0);
+      }
+      return results;
+    },
+    _clearFieldErrors: function() {
+      var field, i, len, ref, results;
+      ref = this.fields;
+      results = [];
+      for (i = 0, len = ref.length; i < len; i++) {
+        field = ref[i];
+        results.push(field.error = null);
+      }
+      return results;
+    }
+  });
+
+}).call(this);
+</script>
+
+</dom-module>

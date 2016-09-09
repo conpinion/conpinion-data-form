@@ -1,0 +1,49 @@
+<!-- build:process -->
+<!--
+<%= copyright %>
+Element: <%= pkg.name %>
+Version: <%= pkg.version %>
+Description: <%= pkg.description %>
+-->
+<!-- /build -->
+
+<link rel="import" href="../lib/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../lib/paper-button/paper-button.html">
+<link rel="import" href="../lib/grapp-i18n-js/grapp-i18n-js.html">
+<link rel="import" href="conpinion-data-fieldset.html">
+<link rel="import" href="conpinion-data-boolean-field.html">
+<link rel="import" href="conpinion-data-select-field.html">
+<link rel="import" href="conpinion-data-multiline-string-field.html">
+<link rel="import" href="conpinion-data-string-field.html">
+
+<dom-module id="conpinion-data-form">
+
+  <link rel="stylesheet" href="../lib/semantic-ui/dist/components/reset.css">
+  <link rel="stylesheet" href="../lib/semantic-ui/dist/components/label.css">
+
+  <template>
+
+  <!-- build:style inline conpinion-data-form -->
+  <link rel="stylesheet" href="conpinion-data-form.css">
+  <!-- /build -->
+
+    <div form>
+
+      <template is="dom-if" if="[[item]]">
+        <content></content>
+      </template>
+
+      <div id="buttonBar">
+        <paper-button class="flex" raised on-tap="save">Speichern</paper-button>
+        <paper-button class="flex" raised on-tap="cancel">Abbrechen</paper-button>
+      </div>
+
+    </div>
+
+  </template>
+
+  <!-- build:script inline conpinion-data-form -->
+  <script src="conpinion-data-form.js"></script>
+  <!-- /build -->
+
+</dom-module>
