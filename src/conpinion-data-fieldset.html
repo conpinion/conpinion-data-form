@@ -1,0 +1,36 @@
+<!-- build:process -->
+<!--
+<%= copyright %>
+Element: <%= pkg.name %>
+Version: <%= pkg.version %>
+Description: <%= pkg.description %>
+-->
+<!-- /build -->
+
+<link rel="import" href="../lib/conpinion-section-header/conpinion-section-header.html">
+
+<dom-module id="conpinion-data-fieldset">
+
+  <template>
+
+    <style>
+      :host {
+        padding-bottom: 2em;
+      }
+      #fields {
+        margin-top: 0.5em;
+      }
+    </style>
+
+    <conpinion-section-header color="orange">[[label]]</conpinion-section-header>
+    <div id="fields">
+      <content></content>
+    </div>
+
+  </template>
+
+  <!-- build:script inline conpinion-data-fieldset -->
+  <script src="conpinion-data-fieldset.js"></script>
+  <!-- /build -->
+
+</dom-module>

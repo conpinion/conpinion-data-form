@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>conpinion-data-form web component</title>
+  <script src='lib/webcomponentsjs/webcomponents-lite.min.js'></script>
+  <link rel="import" href="build/conpinion-data-form.html">
+</head>
+
+<body>
+
+<h1>conpinion-data-form web component</h1>
+
+<h2>A data form web component</h2>
+
+<p>
+  <a href="test/index.html">Click here to run the tests...</a>
+</p>
+
+<p>
+  <a href="README.md">Click here to read the documentation...</a>
+</p>
+
+<p>
+  <a href="CHANGELOG.md">Click here to read the changelog...</a>
+</p>
+
+<h2>Demo</h2>
+
+  <template is="dom-bind" id="template">
+
+  <button on-tap="reset">Reset</button>
+
+  <div style="padding: 32px 64px; width: 64em;">
+    <conpinion-data-form id="form" resource="{{users}}" on-conpinion-data-form-close="closeForm">
+      <conpinion-data-fieldset label="Profile">
+        <conpinion-data-string-field name="email" label="Email"
+                                  description="User email address"></conpinion-data-string-field>
+        <conpinion-data-string-field name="name" label="Name"></conpinion-data-string-field>
+        <conpinion-data-string-field name="contacts.phone" label="Phone Number"></conpinion-data-string-field>
+      </conpinion-data-fieldset>
+      <conpinion-data-fieldset label="Security">
+        <conpinion-data-boolean-field name="active" label="Active"
+                                   description="Is the user active?"></conpinion-data-boolean-field>
+        <conpinion-data-select-field label="Roles" name="roles" description="The user roles"
+                                  selectables='["user","manager","admin"]' simple-items></conpinion-data-select-field>
+      </conpinion-data-fieldset>
+      <conpinion-data-multiline-string-field name="notes" label="Notes" rows="5"
+                                          max-rows="8"></conpinion-data-multiline-string-field>
+    </conpinion-data-form>
+  </div>
+
+</template>
+
+  <script>
+    document.addEventListener('WebComponentsReady', function() {
+      var t = document.querySelector('#template');
+      t.users = {
+        show: function(href) {
+          return new Promise(function(resolve, reject) {
+            resolve({
+              data: {
+                name: 'Alice',
+                email: 'alice@example.com',
+                active: true,
+                roles: ['user', 'admin'],
+                contacts: {
+                  phone: "100"
+                },
+                notes: 'This form element may be used for long text inputs like poems, shopping list, etc.\n' +
+                'It supports multiline texts, an attribute for the initial number of rows\n' +
+                'and another for the maximum number of rows this element can grow to until it scrolls.',
+              },
+              status: 200
+            });
+          });
+        },
+        create: function(o) {
+          alert('Save object: ' + JSON.stringify(o));
+          return Promise.resolve();
+        }
+      };
+      t.closeForm = function() {
+        alert('Closed')
+      };
+      t.reset = function() {
+        document.querySelector('#form').load('/new');
+      }
+      document.querySelector('#form').load('href');
+    })
+  </script>
+
+<script src="//localhost:35729/livereload.js"></script>
+
+</body>
+
+</html>

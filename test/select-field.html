@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>conpinion-dataform select-field tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <script src="../lib/webcomponentsjs/webcomponents.js"></script>
+  <script src="../lib/web-component-tester/browser.js"></script>
+  <script src="../lib/test-fixture/test-fixture-mocha.js"></script>
+  <script src="../lib/coffee-script/extras/coffee-script.js"></script>
+  <link rel="import" href="../lib/grapp-rest-resource/grapp-rest-resource.html">
+  <link rel="import" href="../lib/test-fixture/test-fixture.html">
+  <link rel="import" href="../build/conpinion-data-form.html">
+</head>
+
+<body>
+
+<grapp-rest-resource id="resource" path=":id"></grapp-rest-resource>
+
+<test-fixture id="form-with-simple-item-select">
+  <template>
+    <conpinion-data-form>
+      <conpinion-data-select-field id="field" name="role" simple-items></conpinion-data-select-field>
+    </conpinion-data-form>
+  </template>
+</test-fixture>
+
+<script type="text/coffeescript">
+
+  describe 'a form with a select field', =>
+    context 'when the select field contains simple items', =>
+      beforeEach =>
+        @form = fixture 'form-with-simple-item-select'
+        @form.resource = document.querySelector('#resource').resource
+
+      context 'and a resource is available', =>
+        beforeEach =>
+          @server = sinon.fakeServer.create()
+          @server.respondWith 'GET', '/data/1',
+              [200, {'Content-Type': 'application/json'}, '{"href":"/data/1", "role":["user"]}']
+
+        describe 'loading the item', =>
+          beforeEach (done) =>
+            @form.load '/data/1'
+            @server.respond()
+            flush -> done()
+
+          it 'should show the currently selected resource value', =>
+            expect(Polymer.dom(@form).querySelector('conpinion-data-select-field').textContent).to.match /user/
+
+        context 'when the resource is loaded', =>
+          beforeEach (done) =>
+            @form.load '/data/1'
+            @server.respond()
+            flush -> done()
+
+          describe 'selecting another resource value', =>
+            beforeEach =>
+              @form.querySelector('conpinion-select-box').selected = ['manager']
+
+            describe 'and saving the resource', =>
+              updatedResource = null
+              beforeEach (done) =>
+                @server.respondWith 'PUT', '/data/1', (request) ->
+                  updatedResource = JSON.parse request.requestBody
+                  done()
+                  request.respond [200, {'Content-Type': 'application/json'}, '{}']
+                @form.save()
+                @server.respond()
+
+              it 'should update the item with the new selection', ->
+                expect(updatedResource.role).to.eql ['manager']
+
+</script>
+
+</body>
+
+</html>

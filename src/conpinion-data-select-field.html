@@ -1,0 +1,45 @@
+<!-- build:process -->
+<!--
+<%= copyright %>
+Element: <%= pkg.name %>
+Version: <%= pkg.version %>
+Description: <%= pkg.description %>
+-->
+<!-- /build -->
+
+<link rel="import" href="../lib/conpinion-select-box/conpinion-select-box.html">
+<link rel="import" href="../lib/conpinion-tooltip-icon/conpinion-tooltip-icon.html">
+<link rel="import" href="conpinion-data-form-field.html">
+<link rel="import" href="conpinion-data-form-field-styles.html">
+
+<dom-module id="conpinion-data-select-field">
+
+  <template>
+
+    <style include="conpinion-data-form-field-styles"></style>
+
+    <div field>
+
+      <conpinion-select-box class="flex"
+                         label="[[_fieldLabel(name, label, model)]]"
+                         selected="[[_itemAttribute(item, name)]]"
+                         selectables="[[selectables]]"
+                         simple-items$="[[simpleItems]]"
+                         item-id-property="[[itemIdProperty]]"
+                         item-label-property="[[itemLabelProperty]]"
+                         maximum="[[maximum]]"
+                         error-message="[[error]]" invalid="[[_hasError(error)]]"
+                         on-selected-changed="_onSelectedChanged"></conpinion-select-box>
+
+      <template is="dom-if" if="[[description]]">
+        <conpinion-tooltip-icon description="[[description]]"></conpinion-tooltip-icon>
+      </template>
+
+    </div>
+  </template>
+
+  <!-- build:script inline conpinion-data-select-field -->
+  <script src="conpinion-data-select-field.js"></script>
+  <!-- /build -->
+
+</dom-module>

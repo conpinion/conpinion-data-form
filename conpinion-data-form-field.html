@@ -1,0 +1,65 @@
+
+<!--
+Copyright (c) 2015 TELCAT MULTICOM GmbH. All rights reserved.
+Copyright (c) 2016 conpinion GbR. All rights reserved.
+
+Element: conpinion-data-form
+Version: 0.1.29
+Description: A data form component
+-->
+
+
+<link rel="import" href="../polymer/polymer.html">
+
+<script type="text/javascript">(function() {
+  var conpinionDataFieldBehaviorImpl, id, root;
+
+  id = 1;
+
+  root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+  conpinionDataFieldBehaviorImpl = {
+    properties: {
+      name: {
+        type: String,
+        value: "" + (id++)
+      },
+      label: {
+        type: String,
+        value: ''
+      },
+      model: {
+        type: String,
+        value: ''
+      },
+      description: {
+        type: String
+      },
+      item: {
+        type: Object
+      },
+      error: {
+        type: String
+      }
+    },
+    _hasError: function(error) {
+      return error != null;
+    },
+    _itemAttribute: function(item, field) {
+      return field.split('.').reduce((function(o, x) {
+        return o[x];
+      }), item);
+    },
+    _fieldLabel: function(name, label, model) {
+      if (label) {
+        return label;
+      } else {
+        return this.i18n("attributes." + model + "." + name);
+      }
+    }
+  };
+
+  root.conpinionDataFieldBehavior = [Grapp.I18NJsBehavior, conpinionDataFieldBehaviorImpl];
+
+}).call(this);
+</script>

@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>conpinion-data-form load tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <script src="../lib/webcomponentsjs/webcomponents.js"></script>
+  <script src="../lib/web-component-tester/browser.js"></script>
+  <script src="../lib/test-fixture/test-fixture-mocha.js"></script>
+  <script src="../lib/coffee-script/extras/coffee-script.js"></script>
+  <link rel="import" href="../lib/test-fixture/test-fixture.html">
+  <link rel="import" href="../build/conpinion-data-form.html">
+  <link rel="import" href="../build/conpinion-data-string-field.html">
+</head>
+
+<body>
+
+<test-fixture id="load-form">
+  <template>
+    <conpinion-data-form>
+      <conpinion-data-string-field name="name"></conpinion-data-string-field>
+    </conpinion-data-form>
+  </template>
+</test-fixture>
+
+<script type="text/coffeescript">
+
+  element = null
+
+  describe 'load a form with an empty id', ->
+    beforeEach -> element = fixture 'load-form'
+
+    it 'should show an empty form', (done)->
+      element.resource = {}
+      element.load ''
+      flush ->
+        expect(element.querySelector('paper-input').value).to.be.empty
+        done()
+
+  describe 'load a form with an id that ends with "/new"', ->
+    beforeEach -> element = fixture 'load-form'
+
+    it 'should show a form filled with the default item data', (done)->
+      element.resource =
+        show: () ->
+          new Promise (resolve, reject) ->
+            resolve({data: {name: 'alice'}, status: 200})
+      element.load '/new'
+      flush ->
+        expect(element.querySelector('paper-input').value).to.equal 'alice'
+        done()
+
+  describe 'load a form with a null id', ->
+    beforeEach -> element = fixture 'load-form'
+
+    it 'should show an empty form', (done)->
+      element.resource = {}
+      element.load null
+      flush ->
+        expect(element.querySelector('paper-input').value).to.be.empty
+        done()
+
+  describe 'load a form with an existing item', ->
+    beforeEach -> element = fixture 'load-form'
+
+    it 'should show form filled with the item data', (done)->
+      element.resource =
+        show: (id) ->
+          new Promise (resolve, reject) ->
+            resolve({data: {name: 'alice'}, status: 200})
+
+      element.load '42'
+      flush ->
+        expect(element.querySelector('paper-input').value).to.equal 'alice'
+        done()
+
+</script>
+
+</body>
+
+</html>
